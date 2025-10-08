@@ -248,7 +248,7 @@ class Model(nn.Module):
                 m.anchor_grid = list(map(fn, m.anchor_grid))
         return self
 
-
+DetectionModel = Model
 def parse_model(d, ch):  # model_dict, input_channels(3)
     LOGGER.info('\n%3s%18s%3s%10s  %-40s%-30s' % ('', 'from', 'n', 'params', 'module', 'arguments'))
     anchors, nc, gd, gw = d['anchors'], d['nc'], d['depth_multiple'], d['width_multiple']
