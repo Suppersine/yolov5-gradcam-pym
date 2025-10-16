@@ -72,7 +72,21 @@ class YOLOV5GradCAM:
             b, k, u, v = gradients.size()
             alpha = gradients.view(b, k, -1).mean(2)
             weights = alpha.view(b, k, 1, 1)
-            saliency_map = (weights * activations).sum(1, keepdim=True)
+            
+            ### Forced Equality Backpropagation ###
+            maxdim = max(weights.size(1), activations.size(1))
+            mindim = min(weights.size(1), activations.size(1))
+
+            if weights.size(1) < activations.size(1):
+                muliter = activations.size(1) // weights.size(1)
+                weights = weights.repeat(1, muliter, 1, 1)
+            elif weights.size(1) > activations.size(1):
+                muliter = weights.size(1) // activations.size(1)
+                activations = activations.repeat(1, muliter, 1, 1)
+            else:
+                pass
+
+            ### Calculate the Saliency Maps ###
             saliency_map = F.relu(saliency_map)
             saliency_map = F.upsample(saliency_map, size=(h, w), mode='bilinear', align_corners=False)
             saliency_map_min, saliency_map_max = saliency_map.min(), saliency_map.max()
